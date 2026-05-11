@@ -4,7 +4,7 @@ Camada de integração PHP com a API da Asaas: contrato estável para cobranças
 
 #### Biblioteca não oficial.
 
-Esta biblioteca não é oficial, é desenvolvida a parte, feita para ser utilizada de forma pessoal em sistemas que estou trabalhando.
+Esta biblioteca não é oficial, é desenvolvida a parte, feita para ser utilizada de forma pessoal em sistemas que estou trabalhando. Use por conta e risco próprio.
 
 Baseada na [API V3](https://docs.asaas.com/) da Assas
 
