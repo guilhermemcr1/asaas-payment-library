@@ -266,9 +266,9 @@ asaas-biblioteca/
 
 ## Documentação
 
-- `[docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md)` — HTTP vs in-process, ambiente, erros e validação
-- `[docs/ACOES_INDICE.md](docs/ACOES_INDICE.md)` — índice de todas as ações
-- `[TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md)` — plano de testes e smoke
+- [docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md) — HTTP vs in-process, ambiente, erros e validação
+- [docs/ACOES_INDICE.md](docs/ACOES_INDICE.md) — índice de todas as ações
+- [TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md) — plano de testes e smoke
 
 ## Licença
 
