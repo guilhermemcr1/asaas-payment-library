@@ -256,4 +256,4 @@ asaas-biblioteca/
 
 ## Licença
 
-Defina a licença do repositório (por exemplo MIT ou uso interno) conforme a política do seu projeto.
+Este projeto é licensiado pela licença o MIT, fique a vontade para ver o arquivo LICENSE caso tenha alguma dúvida.
