@@ -1,0 +1,10 @@
+# Config local com credenciais (copie de config/options_example.php)
+config/options.php
+
+# Variáveis de ambiente locais
+.env
+.env.*
+!.env.example
+
+# Dependências PHP (se passar a usar Composer)
+/vendor/

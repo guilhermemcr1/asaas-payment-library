@@ -1,0 +1,20 @@
+CREATE TABLE `asaas_event_log` (
+  `id` char(36) NOT NULL DEFAULT uuid(),
+  `event_id` varchar(100) NOT NULL,
+  `tipo_evento` varchar(120) NOT NULL,
+  `txid` varchar(120) DEFAULT NULL,
+  `fatura_id` int(11) DEFAULT NULL,
+  `situacao_processamento` varchar(30) NOT NULL DEFAULT 'recebido',
+  `payload_raw` longtext DEFAULT NULL,
+  `ip_requisicao` varchar(64) DEFAULT NULL,
+  `app_origem` varchar(120) DEFAULT 'webhook_asaas',
+  `header_token_recebido` varchar(255) DEFAULT NULL,
+  `mensagem_erro` text DEFAULT NULL,
+  `data_evento_gateway` datetime DEFAULT NULL,
+  `data_criacao` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_asaas_event_id` (`event_id`),
+  KEY `idx_asaas_txid` (`txid`),
+  KEY `idx_asaas_tipo_data` (`tipo_evento`, `data_criacao`),
+  KEY `idx_asaas_situacao` (`situacao_processamento`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
