@@ -1,142 +1,79 @@
-# Asaas Biblioteca (Fase 1)
+# Asaas Biblioteca
 
-Biblioteca externa para integração com a API da Asaas, criada para oferecer um contrato estável e reaproveitável em qualquer projeto.
+Camada de integração PHP com a API da Asaas: contrato estável para cobranças, assinaturas, clientes, NFS-e e webhooks. Use no mesmo processo com `AsaasGateway` ou expor um endpoint HTTP único com autenticação interna.
 
-## Escopo desta fase
+## Por que usar
 
-- Criar base da biblioteca.
-- Implementar emissão (PIX, boleto, link de pagamento, assinatura).
-- Implementar webhook seguro e auditável.
-- Não alterar scripts legados da EFI.
+- Um contrato único para PIX, boleto, link de cartão, assinatura e nota fiscal.
+- Duas formas de consumo: PHP in-process ou HTTP JSON com HMAC.
+- Defaults de negócio por ação em `config/*.php`, sobrescritos no payload de cada chamada.
+- Webhook com token, idempotência por `eventId` e trilha de auditoria em banco.
+- Ambiente `auto`, `sandbox` ou `production` com detecção por host.
 
-## Estrutura
+## Recursos
 
-- `src/AsaasGateway.php` fachada in-process (métodos diretos).
-- `src/Config/AsaasConfig.php` configuração por array/env.
-- `src/Http/AsaasHttpClient.php` cliente HTTP.
-- `src/Services/*` regras por domínio.
-- `src/Security/WebhookAuthGuard.php` segurança do webhook.
-- `src/Audit/AsaasEventLogger.php` trilha de auditoria.
-- `sql/asaas_event_log.sql` tabela de eventos.
-- `sql/asaas_fila_processamento.sql` tabela de idempotência/fila de processamento.
-- `public/index.php` endpoint HTTP único da biblioteca.
-- `config/options.php` infraestrutura da biblioteca.
-- `config/*.php` por ação (`issue_invoice`, `create_payment_pix`, `create_payment_card_link`, `create_subscription`, etc.).
+| Área | Capacidades |
+|------|-------------|
+| Pagamentos | PIX, boleto, link de cartão, status, QR Code, atualização, estorno, cancelamento |
+| Assinaturas | Criação, cobranças da assinatura, atualização, cancelamento |
+| Clientes | CRUD, listagem por período ou ID, resolução automática na emissão |
+| NFS-e | Agendar, emitir, consultar, listar e cancelar |
+| Webhook | Recepção segura, deduplicação, eventos `log_only`, mapeamento para status internos |
+| Plataforma | Config por env/arquivo, debug seguro, API interna desligável, testes de contrato |
 
-## Configuração centralizada (estilo EFI)
+## Arquitetura
 
-A biblioteca pode carregar automaticamente `config/options.php` + `config/helpers.php`, usando detecção de ambiente por host (PROD/DEV) no mesmo padrão da SDK EFI.
+```mermaid
+flowchart LR
+  callerHttp[Chamador HTTP]
+  callerPhp[PHP in-process]
+  indexPhp[public/index.php]
+  router[ActionRouter]
+  gateway[AsaasGateway]
+  services[Services]
+  asaasApi[API Asaas]
+  webhook[Webhook Asaas]
+  db[(MariaDB/MySQL)]
 
-Arquivo esperado:
-
-- `config/options.php`
-
-Campos principais:
-
-- `prod_hosts` (hosts que identificam produção)
-- `dev_hosts` (hosts que identificam desenvolvimento/sandbox)
-- `environment` (`auto`, `production` ou `sandbox`)
-- `api.api_key_prod` / `api.api_key_sandbox`
-- `api.base_url_prod` / `api.base_url_sandbox`
-- `webhook.token_prod` / `webhook.token_sandbox`
-- `webhook.token_header`
-- `webhook.allowed_ips`
-- `api.user_agent_base` (prefixo do User-Agent com sufixo automático de ambiente/host)
-- `debug.enabled` / `debug.safe_details` (detalhamento seguro de erros)
-- `internal.http_api_enabled` (habilita chamadas internas via HTTP/cURL; webhook segue ativo)
-
-Prioridade de resolução:
-
-1. config explícita injetada no `AsaasGateway`
-2. variáveis de ambiente (chaves sensíveis: API, webhook, debug, HTTP interno)
-3. `config/options.php`
-4. fallback em código
-
-### Matriz de precedência por chave sensível
-
-| Chave | Array `AsaasGateway` | Env | `options.php` | Fallback em código |
-|-------|----------------------|-----|---------------|--------------------|
-| Ambiente | `environment` ou legado `sandbox` | `ASAAS_ENV` | `environment` (`auto`/`production`/`sandbox`) ou legado `sandbox` | `sandbox` |
-| API key | `api_key` | `ASAAS_API_KEY` | `api.api_key_sandbox` / `api.api_key_prod` | vazio |
-| Base URL API | `api_base_url` | `ASAAS_API_BASE_URL` | `api.base_url_sandbox` / `api.base_url_prod` | URL oficial Asaas |
-| User-Agent | `api_user_agent` | `ASAAS_API_USER_AGENT` | `api.user_agent_base` (+ sufixo ambiente/host) | `AsaasLibrary/1.0` |
-| Token webhook | `webhook_token` | `ASAAS_WEBHOOK_TOKEN` | `webhook.token_sandbox` / `webhook.token_prod` | vazio |
-| Header webhook | `webhook_token_header` | — | `webhook.token_header` | `x-webhook-token` |
-| IPs webhook | `webhook_allowed_ips` | `ASAAS_WEBHOOK_ALLOWED_IPS` | `webhook.allowed_ips` | `[]` |
-| Filtro IP webhook | `webhook_ip_filter_enabled` | `ASAAS_WEBHOOK_IP_FILTER_ENABLED` | `webhook.ip_filter_enabled` | `true` |
-| Token API interna | `internal_token` | — | `internal.token` | vazio |
-| HMAC API interna | `internal_hmac_secret` | — | `internal.hmac_secret` | vazio |
-| HTTP API interna | `internal_http_api_enabled` | `ASAAS_INTERNAL_HTTP_API_ENABLED` | `internal.http_api_enabled` | `true` |
-| Debug | `debug_enabled` | `ASAAS_DEBUG` | `debug.enabled` | `false` |
-| Debug seguro | `debug_safe_details` | — | `debug.safe_details` | `true` |
-| Banco | — | — | `db.sandbox` / `db.prod` (via `isSandbox()`) | `[]` |
-| Defaults por ação | `invoice_defaults`, `{feature}_defaults` | — | `config/{acao}.php` | `[]` |
-
-## Auto-configuração DEV/PROD
-
-Use `environment: auto` em `config/options.php` para alternar sandbox/produção pelos hosts `prod_hosts` e `dev_hosts`. Em `production` ou `sandbox`, o ambiente fica fixo. Com `auto`, host fora das listas cai em sandbox e gera aviso em log; revise as listas antes de produção.
-
-Exemplo no `config/options.php`:
-
-```php
-'prod_hosts' => ['your-production-domain.com', 'www.your-production-domain.com'],
-'dev_hosts' => ['dev.your-domain.local', 'localhost', '127.0.0.1'],
-'api' => [
-  'user_agent_base' => 'AsaasLibrary/1.0',
-],
+  callerHttp --> indexPhp
+  callerPhp --> gateway
+  indexPhp --> router
+  router --> gateway
+  gateway --> services
+  services --> asaasApi
+  webhook --> indexPhp
+  gateway --> db
 ```
 
-Comportamento:
+## Requisitos
 
-- detecta ambiente pelo host comparando `prod_hosts` e `dev_hosts`
-- monta User-Agent automaticamente com ambiente e host
-- formato final: `api.user_agent_base (sandbox|production; host-atual)`
-- fallback base: `AsaasLibrary/1.0`
+- PHP 8.0+
+- Extensões: `curl`, `pdo_mysql` (auditoria e idempotência do webhook)
+- Conta Asaas (sandbox ou produção)
+- MariaDB/MySQL para `asaas_event_log` e `asaas_fila_processamento`
 
-Também é possível sobrescrever por variável de ambiente:
+## Início rápido
 
-- `ASAAS_API_USER_AGENT`
+### 1. Configuração
 
-## Variáveis de ambiente (fallback)
-
-- `ASAAS_API_KEY`
-- `ASAAS_API_BASE_URL` (opcional)
-- `ASAAS_ENV` (`sandbox` ou `production`)
-- `ASAAS_WEBHOOK_TOKEN`
-- `ASAAS_WEBHOOK_ALLOWED_IPS` (lista separada por vírgula)
-- `ASAAS_API_USER_AGENT` (sobrescreve User-Agent automático)
-- `ASAAS_DEBUG` (`1|true|yes|on` para habilitar debug seguro)
-- `ASAAS_INTERNAL_HTTP_API_ENABLED` (`0|false|no|off` desabilita chamadas internas via HTTP/cURL; webhook permanece ativo)
-
-## Debug seguro
-
-Bloco recomendado no `options.php`:
-
-```php
-'debug' => [
-  'enabled' => false,
-  'safe_details' => true,
-],
+```bash
+cp config/options_example.php config/options.php
 ```
 
-Quando `debug.enabled=true` e `safe_details=true`, respostas de erro incluem contexto seguro:
+Edite `config/options.php` com hosts, chaves Asaas, banco e segredos da API interna. O arquivo `config/options.php` não deve ser versionado; use o exemplo como base.
 
-- `environment` (`sandbox` ou `production`)
-- `action`
-- `httpMethod`
-- `statusCode`
-- `exception`
+Ajuste defaults de negócio nos arquivos `config/create_payment_*.php`, `config/create_subscription.php`, `config/issue_invoice.php` e demais features conforme o produto.
 
-Nunca inclui segredos (`api_key`, `internal.token`, `internal.hmac_secret`) nem headers sensíveis.
+### 2. Banco de dados
 
-## Formas de chamada
+Execute os scripts em `sql/`:
 
-Detalhes e tabela de mapeamento: [`docs/USO_CHAMADAS.md`](docs/USO_CHAMADAS.md).
+- `sql/asaas_event_log.sql`
+- `sql/asaas_fila_processamento.sql`
 
-1. HTTP remoto (`public/index.php` + `action` + autenticação interna).
-2. PHP in-process com `AsaasGateway` (métodos diretos).
+Os scripts usam `utf8mb4`. Instalações antigas podem exigir `ALTER TABLE` para alinhar o charset.
 
-## Uso rápido (`AsaasGateway`)
+### 3. Uso in-process (recomendado no mesmo servidor)
 
 ```php
 <?php
@@ -148,199 +85,175 @@ use AsaasBiblioteca\AsaasGateway;
 $gateway = new AsaasGateway([
     'api_key' => getenv('ASAAS_API_KEY'),
     'environment' => 'sandbox',
-    'webhook_token' => getenv('ASAAS_WEBHOOK_TOKEN'),
-    'webhook_token_header' => 'x-webhook-token',
-    'webhook_allowed_ips' => ['1.1.1.1', '2.2.2.2'],
 ]);
 
-$res = $gateway->createPixCharge([
+$result = $gateway->createPixCharge([
     'customer' => 'cus_000000000000',
     'value' => 99.90,
     'dueDate' => date('Y-m-d'),
-    'description' => 'Cobranca de teste',
+    'description' => 'Cobrança de teste',
 ]);
+
+if (empty($result['success'])) {
+    throw new RuntimeException((string) ($result['message'] ?? 'Falha na cobrança.'));
+}
 ```
 
-## Uso externo via cURL (endpoint único)
+### 4. Uso via HTTP
 
-Endpoint sugerido: `https://seu-dominio/asaas-biblioteca/public/index.php`
-
-Para chamadas internas, enviar headers:
-
-- `X-Internal-Token`
-- `X-Timestamp`
-- `X-Signature` (`sha256_hmac(timestamp + "." + rawBody, internal_hmac_secret)`)
-
-Exemplo `create_payment`:
+Publique `public/index.php` e envie `POST` JSON com `action`. Chamadas internas exigem `X-Internal-Token`, `X-Timestamp` e `X-Signature` (HMAC-SHA256 de `timestamp + "." + rawBody`).
 
 ```bash
 curl -X POST "https://seu-dominio/asaas-biblioteca/public/index.php" \
   -H "Content-Type: application/json" \
-  -H "X-Internal-Token: SEU_TOKEN_INTERNO" \
-  -H "X-Timestamp: 1714939200" \
-  -H "X-Signature: SUA_ASSINATURA_HMAC" \
+  -H "X-Internal-Token: SEU_TOKEN" \
+  -H "X-Timestamp: $(date +%s)" \
+  -H "X-Signature: ASSINATURA_HMAC" \
   -d '{
-    "action":"create_payment",
-    "paymentMethod":"pix",
-    "customer":"cus_000000000000",
-    "value":99.9,
-    "dueDate":"2026-05-10",
-    "description":"Cobranca de teste",
-    "couponType":"PERCENTAGE",
-    "couponValue":10,
-    "couponDueDateLimitDays":0
+    "action": "create_payment",
+    "paymentMethod": "pix",
+    "customer": "cus_000000000000",
+    "value": 99.9,
+    "dueDate": "2026-05-10",
+    "description": "Cobrança de teste"
   }'
 ```
 
-Exemplo `get_payment_status`:
+Defina `internal.http_api_enabled = false` (ou `ASAAS_INTERNAL_HTTP_API_ENABLED=false`) para desligar ações internas via HTTP e manter apenas o webhook no endpoint público.
 
-```bash
-curl -X POST "https://seu-dominio/asaas-biblioteca/public/index.php" \
-  -H "Content-Type: application/json" \
-  -H "X-Internal-Token: SEU_TOKEN_INTERNO" \
-  -H "X-Timestamp: 1714939200" \
-  -H "X-Signature: SUA_ASSINATURA_HMAC" \
-  -d '{"action":"get_payment_status","paymentId":"pay_123"}'
+Detalhes de autenticação, mapeamento action → método e exemplos adicionais: [`docs/USO_CHAMADAS.md`](docs/USO_CHAMADAS.md).
+
+## API — ações disponíveis
+
+Todas as ações usam JSON com campo `action` (exceto webhook sem `action`, tratado como `webhook_receive`).
+
+| Grupo | `action` | Documentação |
+|-------|----------|--------------|
+| Pagamento | `create_payment` | [PIX](docs/create_payment_pix.md) · [Boleto](docs/create_payment_billet.md) · [Cartão](docs/create_payment_card_link.md) |
+| Pagamento | `get_payment_status`, `get_pix_qrcode`, `update_payment`, `refund_payment`, `cancel_payment` | [Status](docs/get_payment_status.md) · [QR Code](docs/get_pix_qrcode.md) · [Atualizar](docs/update_payment.md) · [Estorno](docs/refund_payment.md) · [Cancelar](docs/cancel_payment.md) |
+| Assinatura | `create_subscription`, `get_subscription_payments`, `update_subscription`, `cancel_subscription` | [Criar](docs/create_subscription.md) · [Cobranças](docs/get_subscription_payments.md) · [Atualizar](docs/update_subscription.md) · [Cancelar](docs/cancel_subscription.md) |
+| Cliente | `create_customer`, `get_customer`, `list_customers`, `update_customer`, `delete_customer` | [Índice de clientes](docs/ACOES_INDICE.md) |
+| NFS-e | `issue_invoice`, `get_invoice`, `list_invoices`, `cancel_invoice` | [Emitir](docs/issue_invoice.md) · [Consultar](docs/get_invoice.md) · [Listar](docs/list_invoices.md) · [Cancelar](docs/cancel_invoice.md) |
+| Webhook | `webhook_receive` | [Webhook](docs/webhook_receive.md) |
+
+Índice completo: [`docs/ACOES_INDICE.md`](docs/ACOES_INDICE.md).
+
+### Validação de contrato (HTTP)
+
+O `ActionRouter` valida IDs obrigatórios antes de chamar a Asaas. Ausência ou `paymentMethod` inválido retorna HTTP `400` com `errorCode = validationError`. Em `create_payment`, os métodos aceitos são `pix`, `boleto` e `cartao`.
+
+### Resposta padrão
+
+```json
+{
+  "success": true,
+  "message": "Mensagem legível",
+  "data": {},
+  "errorCode": "validationError"
+}
 ```
 
-Exemplo `update_customer` (atualização opcional sob demanda):
+`errorCode` aparece em falhas. No HTTP, detalhes da Asaas só são expostos com `debug.enabled` e `debug.safe_details` ativos.
+
+## Configuração
+
+### Ambiente
+
+Em `config/options.php`:
+
+- `environment: auto` — sandbox ou produção conforme `prod_hosts` e `dev_hosts`
+- `environment: sandbox` ou `production` — ambiente fixo
+
+Com `auto`, host não listado cai em sandbox e gera aviso em log. Revise as listas antes de produção.
+
+### Infraestrutura vs regras por ação
+
+| Tipo | Onde |
+|------|------|
+| Infraestrutura | `config/options.php` — API, webhook, banco, debug, API interna |
+| Negócio por ação | `config/*.php` — vencimento, multas, parcelas, NFS-e, listagens, HTTP defaults |
+
+Na chamada, campos do payload sobrescrevem os defaults do arquivo da ação.
+
+### Precedência de configuração
+
+1. Array injetado no `AsaasGateway`
+2. Variáveis de ambiente (`ASAAS_API_KEY`, `ASAAS_ENV`, `ASAAS_WEBHOOK_TOKEN`, `ASAAS_DEBUG`, `ASAAS_INTERNAL_HTTP_API_ENABLED`, entre outras)
+3. `config/options.php`
+4. Fallback em código
+
+| Chave | Array gateway | Env | `options.php` |
+|-------|---------------|-----|---------------|
+| Ambiente | `environment` | `ASAAS_ENV` | `environment` |
+| API key | `api_key` | `ASAAS_API_KEY` | `api.api_key_*` |
+| Base URL | `api_base_url` | `ASAAS_API_BASE_URL` | `api.base_url_*` |
+| Webhook | `webhook_token` | `ASAAS_WEBHOOK_TOKEN` | `webhook.token_*` |
+| API interna | `internal_http_api_enabled` | `ASAAS_INTERNAL_HTTP_API_ENABLED` | `internal.http_api_enabled` |
+| Debug | `debug_enabled` | `ASAAS_DEBUG` | `debug.enabled` |
+| Defaults NFS-e / ações | `invoice_defaults`, `{feature}_defaults` | — | `config/{acao}.php` |
+
+## Segurança
+
+**API interna (HTTP):** token fixo, timestamp com janela de validade e assinatura HMAC do body; allowlist de IP opcional.
+
+**Webhook:** validação por token no header configurável; filtro de IP opcional (`webhook.ip_filter_enabled`). Idempotência por `eventId` na fila `asaas_fila_processamento`.
+
+**Boas práticas:** não versionar `config/options.php`; preferir variáveis de ambiente em produção; desligar a API HTTP interna se o consumo for só in-process; manter `debug.enabled` desligado fora de homologação.
+
+## Webhook e auditoria
+
+Sem `action` no body, o endpoint assume `webhook_receive`. Eventos financeiros mapeiam para status internos (`Pago`, `Pendente`, `Vencido`, `Cancelado`); eventos informativos seguem política `log_only`.
+
+Reentregas com o mesmo `eventId` respondem HTTP `200` sem reprocessar. Falhas de persistência em auditoria não derrubam a resposta do webhook quando a decisão de negócio já foi tomada.
+
+Eventos e metadados ficam em `asaas_event_log`. Ver [`docs/webhook_receive.md`](docs/webhook_receive.md).
+
+## Comportamentos úteis
+
+**Cliente na emissão:** envie `customer` (`cus_...`) ou `customerData` para buscar, criar ou atualizar antes de cobrar. Ver [`docs/cliente_resolucao_automatica.md`](docs/cliente_resolucao_automatica.md).
+
+**Cupom:** `couponType`, `couponValue` e `couponDueDateLimitDays` convertem para `discount` da Asaas; também é aceito `discount` no formato da API.
+
+**NFS-e:** defaults em `config/issue_invoice.php`; `issueNow` controla agendar vs emitir na sequência.
+
+## Testes
 
 ```bash
-curl -X POST "https://seu-dominio/asaas-biblioteca/public/index.php" \
-  -H "Content-Type: application/json" \
-  -H "X-Internal-Token: SEU_TOKEN_INTERNO" \
-  -H "X-Timestamp: 1714939200" \
-  -H "X-Signature: SUA_ASSINATURA_HMAC" \
-  -d '{
-    "action":"update_customer",
-    "customer":"cus_000000000000",
-    "customerData":{
-      "name":"Empresa Exemplo LTDA",
-      "email":"financeiro@empresa.com.br",
-      "phone":"11999999999",
-      "address":"Rua Exemplo",
-      "addressNumber":"100"
-    }
-  }'
+php tests/contract_test.php
+php tests/security_test.php
 ```
 
-## Cupom e desconto
+Checklist manual (sandbox e produção): [`TESTES_BIBLIOTECA.md`](TESTES_BIBLIOTECA.md).
 
-O fluxo recomendado é enviar cupom interno da sua aplicação e a biblioteca converter para `discount` da Asaas.
+## Estrutura do projeto
 
-Campos aceitos:
+```
+asaas-biblioteca/
+├── config/           # options, helpers e defaults por ação
+├── docs/             # referência por action
+├── public/           # index.php (HTTP + webhook)
+├── sql/              # auditoria e idempotência
+├── src/
+│   ├── AsaasGateway.php
+│   ├── Config/
+│   ├── Http/
+│   ├── Services/
+│   ├── Security/
+│   ├── Audit/
+│   └── Infrastructure/
+└── tests/
+```
 
-- `couponType` (`PERCENTAGE` ou `FIXED`)
-- `couponValue`
-- `couponDueDateLimitDays`
+## Cliente HTTP
 
-Também é aceito `discount` já pronto no formato Asaas.
+`AsaasHttpClient` usa `GET`, `POST` e `DELETE` contra a API v3 da Asaas. Timeout e retentativas vêm de `api.timeout_seconds` e `api.retry_attempts` em `config/options.php`.
 
-## NFS-e (manual)
+## Documentação
 
-A biblioteca suporta emissão manual de nota fiscal por:
+- [`docs/USO_CHAMADAS.md`](docs/USO_CHAMADAS.md) — HTTP vs in-process, ambiente, erros e validação
+- [`docs/ACOES_INDICE.md`](docs/ACOES_INDICE.md) — índice de todas as ações
+- [`TESTES_BIBLIOTECA.md`](TESTES_BIBLIOTECA.md) — plano de testes e smoke
 
-- `action=issue_invoice` com `paymentId`
+## Licença
 
-Na chamada de `issue_invoice`, você pode personalizar a descrição de 3 formas:
-
-- `invoice.description` (prioridade mais alta)
-- `description` no payload raiz (atalho)
-- `invoiceDescription` no payload raiz (alias)
-
-Também é possível solicitar emissão imediata após o agendamento:
-
-- padrão: a biblioteca já tenta emitir automaticamente (`issueNow=true`) após agendar
-- para apenas agendar sem emitir, envie `issueNow=false`
-
-### Configuração em `config/issue_invoice.php`
-
-Defaults fiscais da ação `issue_invoice` ficam fora de `options.php`, em arquivo dedicado da funcionalidade.
-
-## Resolução de cliente antes da emissão
-
-Antes de emitir cobrança/assinatura, a biblioteca resolve o cliente automaticamente:
-
-- Se `customer` (`cus_...`) for enviado, usa esse ID.
-- Se `customerData` for enviado, a biblioteca:
-  - busca cliente existente por `cpfCnpj`, `externalReference` ou `email`;
-  - cria cliente se não encontrar;
-  - compara campos principais e atualiza cadastro quando houver diferença.
-
-Campos suportados em `customerData`: `name`, `cpfCnpj`, `email`, `phone`, `mobilePhone`, `postalCode`, `address`, `addressNumber`, `complement`, `province`, `externalReference`.
-
-Para atualização opcional manual, use `action=update_customer` com:
-
-- `customer` (obrigatório): ID Asaas no formato `cus_...`
-- `customerData` (obrigatório): campos parciais que deseja atualizar
-
-Se `customer` estiver vazio ou nenhum campo for enviado em `customerData`, a API retorna erro de validação.
-
-## Datas e vencimento suportados
-
-- Cobranças (`/payments`): `dueDate`, `daysAfterDueDateToRegistrationCancellation`
-- Assinaturas (`/subscriptions`): `nextDueDate`, `endDate`, `maxPayments`
-- Link de pagamento (`/paymentLinks`): `endDate`, `dueDateLimitDays`, `subscriptionCycle`, `maxInstallmentCount`
-  - quando `endDate` não é enviado, a biblioteca aplica default de expiração (D+1 por padrão)
-
-## Contrato de saída padrão
-
-- `transactionId`
-- `link`
-- `pixCode`
-- `status`
-
-Campos extras:
-
-- `qrCodeImage`
-- `pixKey`
-- `expirationDate`
-- `raw`
-
-## Webhook
-
-`processWebhook(rawBody, headers, remoteIp, httpMethod)` retorna:
-
-- `statusCode`
-- `payload` com envelope:
-  - sucesso: `success=true`, `message`, `data`
-  - erro: `success=false`, `message`, `errorCode`, `data`
-
-Mapeamento HTTP definido:
-
-- `200` sucesso
-- `200` evento informativo (`log_only`)
-- `200` duplicado (idempotência)
-- `400` payload inválido
-- `403` token/IP inválido
-- `405` método inválido
-- `500` erro interno
-
-No endpoint único, quando `action` não for enviado, a biblioteca trata automaticamente como `webhook_receive`.
-
-### Política de mapeamento de status/eventos
-
-A biblioteca mantém 4 estados internos finais:
-
-- `Pago`
-- `Pendente`
-- `Vencido`
-- `Cancelado`
-
-Eventos não financeiros (ex.: visualização, split, dunning, ciclo de assinatura sem liquidação) são tratados como `log_only`: entram na auditoria sem forçar mudança financeira.
-
-Referência detalhada de matriz de eventos: `docs/webhook_receive.md`.
-
-## Auditoria
-
-A tabela de auditoria é criada pelo SQL:
-
-- `sql/asaas_event_log.sql`
-
-Ela registra eventos recebidos, processados, ignorados e erros com payload e metadados de origem.
-
-Os scripts SQL usam `utf8mb4`. Bancos já criados com charset antigo precisam de `ALTER TABLE` manual para alinhar com `db.*.charset`.
-
-## Cliente HTTP Asaas
-
-O `AsaasHttpClient` usa `GET`, `POST` e `DELETE`; alterações na API Asaas que exigem `POST` seguem esse padrão. Timeout e retentativas vêm de `api.timeout_seconds` e `api.retry_attempts` em `config/options.php`.
+Defina a licença do repositório (por exemplo MIT ou uso interno) conforme a política do seu projeto.
