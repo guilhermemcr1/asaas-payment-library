@@ -1,6 +1,12 @@
-# Asaas Biblioteca
+# Asaas Biblioteca de Pagamento
 
 Camada de integração PHP com a API da Asaas: contrato estável para cobranças, assinaturas, clientes, NFS-e e webhooks. Use no mesmo processo com `AsaasGateway` ou expor um endpoint HTTP único com autenticação interna.
+
+#### Biblioteca não oficial.
+
+Esta biblioteca não é oficial, é desenvolvida a parte, feita para ser utilizada de forma pessoal em sistemas que estou trabalhando.
+
+Baseada na [API V3](https://docs.asaas.com/) da Assas
 
 ## Por que usar
 
@@ -12,14 +18,16 @@ Camada de integração PHP com a API da Asaas: contrato estável para cobranças
 
 ## Recursos
 
-| Área | Capacidades |
-|------|-------------|
-| Pagamentos | PIX, boleto, link de cartão, status, QR Code, atualização, estorno, cancelamento |
-| Assinaturas | Criação, cobranças da assinatura, atualização, cancelamento |
-| Clientes | CRUD, listagem por período ou ID, resolução automática na emissão |
-| NFS-e | Agendar, emitir, consultar, listar e cancelar |
-| Webhook | Recepção segura, deduplicação, eventos `log_only`, mapeamento para status internos |
-| Plataforma | Config por env/arquivo, debug seguro, API interna desligável, testes de contrato |
+
+| Área        | Capacidades                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| Pagamentos  | PIX, boleto, link de cartão, status, QR Code, atualização, estorno, cancelamento   |
+| Assinaturas | Criação, cobranças da assinatura, atualização, cancelamento                        |
+| Clientes    | CRUD, listagem por período ou ID, resolução automática na emissão                  |
+| NFS-e       | Agendar, emitir, consultar, listar e cancelar                                      |
+| Webhook     | Recepção segura, deduplicação, eventos `log_only`, mapeamento para status internos |
+| Plataforma  | Config por env/arquivo, debug seguro, API interna desligável, testes de contrato   |
+
 
 ## Arquitetura
 
@@ -44,6 +52,8 @@ flowchart LR
   webhook --> indexPhp
   gateway --> db
 ```
+
+
 
 ## Requisitos
 
@@ -121,22 +131,24 @@ curl -X POST "https://seu-dominio/asaas-biblioteca/public/index.php" \
 
 Defina `internal.http_api_enabled = false` (ou `ASAAS_INTERNAL_HTTP_API_ENABLED=false`) para desligar ações internas via HTTP e manter apenas o webhook no endpoint público.
 
-Detalhes de autenticação, mapeamento action → método e exemplos adicionais: [`docs/USO_CHAMADAS.md`](docs/USO_CHAMADAS.md).
+Detalhes de autenticação, mapeamento action → método e exemplos adicionais: `[docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md)`.
 
 ## API — ações disponíveis
 
 Todas as ações usam JSON com campo `action` (exceto webhook sem `action`, tratado como `webhook_receive`).
 
-| Grupo | `action` | Documentação |
-|-------|----------|--------------|
-| Pagamento | `create_payment` | [PIX](docs/create_payment_pix.md) · [Boleto](docs/create_payment_billet.md) · [Cartão](docs/create_payment_card_link.md) |
-| Pagamento | `get_payment_status`, `get_pix_qrcode`, `update_payment`, `refund_payment`, `cancel_payment` | [Status](docs/get_payment_status.md) · [QR Code](docs/get_pix_qrcode.md) · [Atualizar](docs/update_payment.md) · [Estorno](docs/refund_payment.md) · [Cancelar](docs/cancel_payment.md) |
-| Assinatura | `create_subscription`, `get_subscription_payments`, `update_subscription`, `cancel_subscription` | [Criar](docs/create_subscription.md) · [Cobranças](docs/get_subscription_payments.md) · [Atualizar](docs/update_subscription.md) · [Cancelar](docs/cancel_subscription.md) |
-| Cliente | `create_customer`, `get_customer`, `list_customers`, `update_customer`, `delete_customer` | [Índice de clientes](docs/ACOES_INDICE.md) |
-| NFS-e | `issue_invoice`, `get_invoice`, `list_invoices`, `cancel_invoice` | [Emitir](docs/issue_invoice.md) · [Consultar](docs/get_invoice.md) · [Listar](docs/list_invoices.md) · [Cancelar](docs/cancel_invoice.md) |
-| Webhook | `webhook_receive` | [Webhook](docs/webhook_receive.md) |
 
-Índice completo: [`docs/ACOES_INDICE.md`](docs/ACOES_INDICE.md).
+| Grupo      | `action`                                                                                         | Documentação                                                                                                                                                                            |
+| ---------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pagamento  | `create_payment`                                                                                 | [PIX](docs/create_payment_pix.md) · [Boleto](docs/create_payment_billet.md) · [Cartão](docs/create_payment_card_link.md)                                                                |
+| Pagamento  | `get_payment_status`, `get_pix_qrcode`, `update_payment`, `refund_payment`, `cancel_payment`     | [Status](docs/get_payment_status.md) · [QR Code](docs/get_pix_qrcode.md) · [Atualizar](docs/update_payment.md) · [Estorno](docs/refund_payment.md) · [Cancelar](docs/cancel_payment.md) |
+| Assinatura | `create_subscription`, `get_subscription_payments`, `update_subscription`, `cancel_subscription` | [Criar](docs/create_subscription.md) · [Cobranças](docs/get_subscription_payments.md) · [Atualizar](docs/update_subscription.md) · [Cancelar](docs/cancel_subscription.md)              |
+| Cliente    | `create_customer`, `get_customer`, `list_customers`, `update_customer`, `delete_customer`        | [Índice de clientes](docs/ACOES_INDICE.md)                                                                                                                                              |
+| NFS-e      | `issue_invoice`, `get_invoice`, `list_invoices`, `cancel_invoice`                                | [Emitir](docs/issue_invoice.md) · [Consultar](docs/get_invoice.md) · [Listar](docs/list_invoices.md) · [Cancelar](docs/cancel_invoice.md)                                               |
+| Webhook    | `webhook_receive`                                                                                | [Webhook](docs/webhook_receive.md)                                                                                                                                                      |
+
+
+Índice completo: `[docs/ACOES_INDICE.md](docs/ACOES_INDICE.md)`.
 
 ### Validação de contrato (HTTP)
 
@@ -168,10 +180,12 @@ Com `auto`, host não listado cai em sandbox e gera aviso em log. Revise as list
 
 ### Infraestrutura vs regras por ação
 
-| Tipo | Onde |
-|------|------|
-| Infraestrutura | `config/options.php` — API, webhook, banco, debug, API interna |
+
+| Tipo             | Onde                                                                           |
+| ---------------- | ------------------------------------------------------------------------------ |
+| Infraestrutura   | `config/options.php` — API, webhook, banco, debug, API interna                 |
 | Negócio por ação | `config/*.php` — vencimento, multas, parcelas, NFS-e, listagens, HTTP defaults |
+
 
 Na chamada, campos do payload sobrescrevem os defaults do arquivo da ação.
 
@@ -182,15 +196,17 @@ Na chamada, campos do payload sobrescrevem os defaults do arquivo da ação.
 3. `config/options.php`
 4. Fallback em código
 
-| Chave | Array gateway | Env | `options.php` |
-|-------|---------------|-----|---------------|
-| Ambiente | `environment` | `ASAAS_ENV` | `environment` |
-| API key | `api_key` | `ASAAS_API_KEY` | `api.api_key_*` |
-| Base URL | `api_base_url` | `ASAAS_API_BASE_URL` | `api.base_url_*` |
-| Webhook | `webhook_token` | `ASAAS_WEBHOOK_TOKEN` | `webhook.token_*` |
-| API interna | `internal_http_api_enabled` | `ASAAS_INTERNAL_HTTP_API_ENABLED` | `internal.http_api_enabled` |
-| Debug | `debug_enabled` | `ASAAS_DEBUG` | `debug.enabled` |
-| Defaults NFS-e / ações | `invoice_defaults`, `{feature}_defaults` | — | `config/{acao}.php` |
+
+| Chave                  | Array gateway                            | Env                               | `options.php`               |
+| ---------------------- | ---------------------------------------- | --------------------------------- | --------------------------- |
+| Ambiente               | `environment`                            | `ASAAS_ENV`                       | `environment`               |
+| API key                | `api_key`                                | `ASAAS_API_KEY`                   | `api.api_key_*`             |
+| Base URL               | `api_base_url`                           | `ASAAS_API_BASE_URL`              | `api.base_url_*`            |
+| Webhook                | `webhook_token`                          | `ASAAS_WEBHOOK_TOKEN`             | `webhook.token_*`           |
+| API interna            | `internal_http_api_enabled`              | `ASAAS_INTERNAL_HTTP_API_ENABLED` | `internal.http_api_enabled` |
+| Debug                  | `debug_enabled`                          | `ASAAS_DEBUG`                     | `debug.enabled`             |
+| Defaults NFS-e / ações | `invoice_defaults`, `{feature}_defaults` | —                                 | `config/{acao}.php`         |
+
 
 ## Segurança
 
@@ -206,11 +222,11 @@ Sem `action` no body, o endpoint assume `webhook_receive`. Eventos financeiros m
 
 Reentregas com o mesmo `eventId` respondem HTTP `200` sem reprocessar. Falhas de persistência em auditoria não derrubam a resposta do webhook quando a decisão de negócio já foi tomada.
 
-Eventos e metadados ficam em `asaas_event_log`. Ver [`docs/webhook_receive.md`](docs/webhook_receive.md).
+Eventos e metadados ficam em `asaas_event_log`. Ver `[docs/webhook_receive.md](docs/webhook_receive.md)`.
 
 ## Comportamentos úteis
 
-**Cliente na emissão:** envie `customer` (`cus_...`) ou `customerData` para buscar, criar ou atualizar antes de cobrar. Ver [`docs/cliente_resolucao_automatica.md`](docs/cliente_resolucao_automatica.md).
+**Cliente na emissão:** envie `customer` (`cus_...`) ou `customerData` para buscar, criar ou atualizar antes de cobrar. Ver `[docs/cliente_resolucao_automatica.md](docs/cliente_resolucao_automatica.md)`.
 
 **Cupom:** `couponType`, `couponValue` e `couponDueDateLimitDays` convertem para `discount` da Asaas; também é aceito `discount` no formato da API.
 
@@ -223,7 +239,7 @@ php tests/contract_test.php
 php tests/security_test.php
 ```
 
-Checklist manual (sandbox e produção): [`TESTES_BIBLIOTECA.md`](TESTES_BIBLIOTECA.md).
+Checklist manual (sandbox e produção): `[TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md)`.
 
 ## Estrutura do projeto
 
@@ -250,9 +266,9 @@ asaas-biblioteca/
 
 ## Documentação
 
-- [`docs/USO_CHAMADAS.md`](docs/USO_CHAMADAS.md) — HTTP vs in-process, ambiente, erros e validação
-- [`docs/ACOES_INDICE.md`](docs/ACOES_INDICE.md) — índice de todas as ações
-- [`TESTES_BIBLIOTECA.md`](TESTES_BIBLIOTECA.md) — plano de testes e smoke
+- `[docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md)` — HTTP vs in-process, ambiente, erros e validação
+- `[docs/ACOES_INDICE.md](docs/ACOES_INDICE.md)` — índice de todas as ações
+- `[TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md)` — plano de testes e smoke
 
 ## Licença
 
