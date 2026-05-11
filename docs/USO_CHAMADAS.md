@@ -2,6 +2,8 @@
 
 A biblioteca oferece dois caminhos para a mesma regra de negócio.
 
+Configure o deploy copiando [`config/options_example.php`](../config/options_example.php) para `config/options.php` e preenchendo credenciais fora do Git. Visão geral: [`README.md`](../README.md).
+
 ## 1. HTTP remoto (cURL)
 
 Use quando o chamador estiver em outro servidor ou processo. Envie `POST` JSON para `public/index.php` com autenticação interna (`X-Internal-Token`, `X-Timestamp`, `X-Signature`).

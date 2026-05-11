@@ -2,7 +2,7 @@
 
 Documentação separada por ação disponível no endpoint único `public/index.php`.
 
-Formas de chamada (HTTP e `AsaasGateway`): [`USO_CHAMADAS.md`](./USO_CHAMADAS.md).
+Visão geral e início rápido: [`README.md`](../README.md). Formas de chamada (HTTP e `AsaasGateway`): [`USO_CHAMADAS.md`](./USO_CHAMADAS.md). Checklist de testes: [`TESTES_BIBLIOTECA.md`](../TESTES_BIBLIOTECA.md).
 
 ## Ações de emissão
 

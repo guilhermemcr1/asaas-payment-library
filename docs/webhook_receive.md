@@ -7,7 +7,7 @@ Receber eventos do webhook da Asaas com validação de segurança, auditoria e i
 ## Observações de roteamento
 
 - Se `action` não for enviada no body, o endpoint assume automaticamente `webhook_receive`.
-- Esta ação usa validação de webhook (`token + IP`) e não o fluxo de autenticação interna por HMAC.
+- Esta ação usa validação de webhook (token e, opcionalmente, IP) e não o fluxo de autenticação interna por HMAC.
 
 ## Segurança
 
@@ -15,7 +15,7 @@ Validações aplicadas:
 
 - método HTTP deve ser `POST`
 - token no header configurado (`webhook.token_header`)
-- IP em `webhook.allowed_ips`
+- IP em `webhook.allowed_ips` somente quando `webhook.ip_filter_enabled` estiver ativo em `config/options.php`
 
 ## Comportamento de processamento
 
