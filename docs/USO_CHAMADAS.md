@@ -43,7 +43,11 @@ Precedência: array injetado no `AsaasGateway` → `ASAAS_ENV` → `options.envi
 
 ## Defaults por ação
 
-Regras de negócio ficam em arquivos dedicados em `config/` (ex.: `create_payment_card_link.php`, `issue_invoice.php`). Na chamada, campos enviados no payload sobrescrevem o arquivo.
+Regras de negócio ficam em arquivos dedicados em `config/` (ex.: `create_payment_card_link.php`, `issue_invoice.php`, `http_actions.php`, `listagens.php`). Na chamada, campos enviados no payload sobrescrevem o arquivo.
+
+Em `create_payment` via HTTP, `paymentMethod` pode ser omitido quando `config/http_actions.php` define `defaultPaymentMethod` (padrão `pix`). Listagens sem `limit` usam `defaultLimit` de `config/listagens.php` (padrão `100`).
+
+Desconto, cupom, multas e juros: [`desconto_multas_juros.md`](./desconto_multas_juros.md).
 
 ## Resposta padrão
 

@@ -4,7 +4,7 @@ Camada de integração PHP com a API da Asaas: contrato estável para cobranças
 
 #### Biblioteca não oficial.
 
-Esta biblioteca não é oficial, é desenvolvida a parte, feita para ser utilizada de forma pessoal em sistemas que estou trabalhando. Use por conta e risco próprio.
+Esta biblioteca não é oficial, é desenvolvida a parte, feita para ser utilizada de forma pessoal em sistemas que estou trabalhando.
 
 Baseada na [API V3](https://docs.asaas.com/) da Assas
 
@@ -228,7 +228,7 @@ Eventos e metadados ficam em `asaas_event_log`. Ver `[docs/webhook_receive.md](d
 
 **Cliente na emissão:** envie `customer` (`cus_...`) ou `customerData` para buscar, criar ou atualizar antes de cobrar. Ver `[docs/cliente_resolucao_automatica.md](docs/cliente_resolucao_automatica.md)`.
 
-**Cupom:** `couponType`, `couponValue` e `couponDueDateLimitDays` convertem para `discount` da Asaas; também é aceito `discount` no formato da API.
+**Cupom e desconto:** `couponType`, `couponValue` e `couponDueDateLimitDays` convertem para `discount` da Asaas; também é aceito `discount` no formato da API. Guia completo: `[docs/desconto_multas_juros.md](docs/desconto_multas_juros.md)`.
 
 **NFS-e:** defaults em `config/issue_invoice.php`; `issueNow` controla agendar vs emitir na sequência.
 
@@ -266,9 +266,9 @@ asaas-biblioteca/
 
 ## Documentação
 
-- [docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md) — HTTP vs in-process, ambiente, erros e validação
-- [docs/ACOES_INDICE.md](docs/ACOES_INDICE.md) — índice de todas as ações
-- [TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md) — plano de testes e smoke
+- `[docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md)` — HTTP vs in-process, ambiente, erros e validação
+- `[docs/ACOES_INDICE.md](docs/ACOES_INDICE.md)` — índice de todas as ações
+- `[TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md)` — plano de testes e smoke
 
 ## Licença
 

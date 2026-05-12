@@ -33,6 +33,7 @@ Visão geral e início rápido: [`README.md`](../README.md). Formas de chamada (
 - [`update_customer`](./update_customer.md)
 - [`delete_customer`](./delete_customer.md)
 - [`cliente_resolucao_automatica` (usada em emissão)](./cliente_resolucao_automatica.md)
+- [`desconto_multas_juros` (cupom, desconto, multas e juros)](./desconto_multas_juros.md)
 
 ## Ações fiscais (NFS-e)
 

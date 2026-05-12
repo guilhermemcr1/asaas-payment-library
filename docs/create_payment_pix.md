@@ -6,7 +6,7 @@ Criar cobrança PIX na Asaas e retornar `transactionId`, `pixCode`, imagem QRCod
 
 ## Defaults em arquivo
 
-`config/create_payment_pix.php` define vencimento, descrição, multas/juros e demais campos padrão. O payload da chamada sobrescreve esses valores.
+`config/create_payment_pix.php` define vencimento (`dueDateOffsetDays`), descrição, desconto, multas/juros e demais campos padrão. O payload da chamada sobrescreve esses valores. Ver [`desconto_multas_juros.md`](./desconto_multas_juros.md).
 
 ## Payload
 
@@ -23,16 +23,13 @@ Cliente (uma das opções):
 
 Opcionais principais:
 
-- `dueDate` (`Y-m-d`)
+- `dueDate` (`Y-m-d`); se omitido, usa hoje + `dueDateOffsetDays` do arquivo de config
 - `description`
 - `externalReference`
 - `daysAfterDueDateToRegistrationCancellation`
 - `postalService`
-- `discount` (objeto Asaas) ou cupom interno:
-  - `couponType` (`PERCENTAGE` | `FIXED`)
-  - `couponValue`
-  - `couponDueDateLimitDays`
-- `fine`, `interest`, `split`, `callback`
+- `discount` (objeto Asaas) ou cupom interno (`couponType`, `couponValue`, `couponDueDateLimitDays` e aliases `coupon_*`)
+- `fine`, `interest`, `split`, `callback` (formato Asaas; detalhes em [`desconto_multas_juros.md`](./desconto_multas_juros.md))
 
 ## Exemplo
 

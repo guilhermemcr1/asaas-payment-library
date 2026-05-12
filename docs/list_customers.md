@@ -9,7 +9,7 @@ Listar clientes por período ou buscar um cliente específico.
 1. Por ID: informe `customerId` (retorna `data.item`).
 2. Por período: informe `startDate` e `endDate` (`YYYY-MM-DD`).
 
-Filtros opcionais: `name`, `email`, `cpfCnpj`, `externalReference`, `offset`, `limit`.
+Filtros opcionais: `name`, `email`, `cpfCnpj`, `externalReference`, `offset`, `limit` (padrão `100` via `config/listagens.php` quando omitido).
 
 ## Exemplo HTTP (período)
 

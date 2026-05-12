@@ -11,7 +11,15 @@ Antes de emitir pagamento/assinatura, a biblioteca resolve o cliente automaticam
 
 ## Defaults em arquivo
 
-`config/cliente_resolucao_automatica.php` define `fallbackName` quando o nome do cliente não é informado na criação automática.
+`config/cliente_resolucao_automatica.php` define `fallbackName` quando o nome do cliente não é informado na criação automática (padrão `Default Customer`).
+
+Exemplo no arquivo:
+
+```php
+'defaults' => [
+    'fallbackName' => 'Cliente Finax',
+],
+```
 
 ## Regras
 

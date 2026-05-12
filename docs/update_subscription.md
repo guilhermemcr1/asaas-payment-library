@@ -8,7 +8,9 @@ Atualizar uma assinatura existente.
 
 - `action`: `update_subscription`
 - `subscriptionId`: `sub_...`
-- `subscriptionData`: campos a alterar (`value`, `nextDueDate`, `cycle`, `billingType`, `updatePendingPayments`, etc.)
+- `subscriptionData`: campos a alterar (`value`, `nextDueDate`, `cycle`, `billingType`, `updatePendingPayments`, `discount`, `fine`, `interest`, `split`, etc.)
+
+Na atualização, use `discount` no formato Asaas; cupom interno não é convertido neste fluxo. Ver [`desconto_multas_juros.md`](./desconto_multas_juros.md).
 
 ## Exemplo HTTP
 

@@ -6,7 +6,7 @@ Criar cobrança por boleto na Asaas e retornar `transactionId`, `link` e status 
 
 ## Defaults em arquivo
 
-`config/create_payment_billet.php` define vencimento, descrição, multas/juros e demais campos padrão. O payload da chamada sobrescreve esses valores.
+`config/create_payment_billet.php` define vencimento (`dueDateOffsetDays`), descrição, desconto, multas/juros e demais campos padrão. O payload da chamada sobrescreve esses valores. Ver [`desconto_multas_juros.md`](./desconto_multas_juros.md).
 
 ## Payload
 
@@ -22,13 +22,13 @@ Cliente:
 
 Opcionais:
 
-- `dueDate` (`Y-m-d`)
+- `dueDate` (`Y-m-d`); se omitido, usa hoje + `dueDateOffsetDays` do arquivo de config
 - `description`
 - `externalReference`
 - `daysAfterDueDateToRegistrationCancellation`
 - `postalService`
-- `discount` ou cupom (`couponType`, `couponValue`, `couponDueDateLimitDays`)
-- `fine`, `interest`, `split`, `callback`
+- `discount` ou cupom (`couponType`, `couponValue`, `couponDueDateLimitDays` e aliases `coupon_*`)
+- `fine`, `interest`, `split`, `callback` (detalhes em [`desconto_multas_juros.md`](./desconto_multas_juros.md))
 
 ## Exemplo
 

@@ -29,7 +29,7 @@ Opcionais principais:
 - `externalReference`
 - `notificationEnabled`
 - `isAddressRequired`
-- `callback`
+- `callback` (link de cartão não aceita desconto, multa ou juros na biblioteca)
 
 ## Exemplo
 

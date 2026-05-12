@@ -9,7 +9,7 @@ Listar notas fiscais por período ou buscar uma nota específica.
 1. Por ID: informe `invoiceId` (retorna `data.item`).
 2. Por período: informe `startDate` e `endDate` (`YYYY-MM-DD`).
 
-Filtros opcionais: `payment`, `customer`, `status`, `offset`, `limit`.
+Filtros opcionais: `payment`, `customer`, `status`, `offset`, `limit` (padrão `100` via `config/listagens.php` quando omitido).
 
 ## Exemplo HTTP (período)
 
