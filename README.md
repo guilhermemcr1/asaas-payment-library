@@ -205,7 +205,7 @@ Na chamada, campos do payload sobrescrevem os defaults do arquivo da ação.
 | Webhook                | `webhook_token`                          | `ASAAS_WEBHOOK_TOKEN`             | `webhook.token_*`           |
 | API interna            | `internal_http_api_enabled`              | `ASAAS_INTERNAL_HTTP_API_ENABLED` | `internal.http_api_enabled` |
 | Debug                  | `debug_enabled`                          | `ASAAS_DEBUG`                     | `debug.enabled`             |
-| Defaults NFS-e / ações | `invoice_defaults`, `{feature}_defaults` | —                                 | `config/{acao}.php`         |
+| Defaults NFS-e / ações | `invoice_defaults` | —                                 | `config/issue_invoice.php`         |
 
 
 ## Segurança
