@@ -131,7 +131,7 @@ curl -X POST "https://seu-dominio/asaas-biblioteca/public/index.php" \
 
 Defina `internal.http_api_enabled = false` (ou `ASAAS_INTERNAL_HTTP_API_ENABLED=false`) para desligar ações internas via HTTP e manter apenas o webhook no endpoint público.
 
-Detalhes de autenticação, mapeamento action → método e exemplos adicionais: `[docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md)`.
+Detalhes de autenticação, mapeamento action → método e exemplos adicionais: [USO_CHAMADAS.md](docs/USO_CHAMADAS.md).
 
 ## API — ações disponíveis
 
@@ -148,7 +148,7 @@ Todas as ações usam JSON com campo `action` (exceto webhook sem `action`, trat
 | Webhook    | `webhook_receive`                                                                                | [Webhook](docs/webhook_receive.md)                                                                                                                                                      |
 
 
-Índice completo: `[docs/ACOES_INDICE.md](docs/ACOES_INDICE.md)`.
+Índice completo: [ACOES_INDICE.md](docs/ACOES_INDICE.md).
 
 ### Validação de contrato (HTTP)
 
@@ -222,13 +222,13 @@ Sem `action` no body, o endpoint assume `webhook_receive`. Eventos financeiros m
 
 Reentregas com o mesmo `eventId` respondem HTTP `200` sem reprocessar. Falhas de persistência em auditoria não derrubam a resposta do webhook quando a decisão de negócio já foi tomada.
 
-Eventos e metadados ficam em `asaas_event_log`. Ver `[docs/webhook_receive.md](docs/webhook_receive.md)`.
+Eventos e metadados ficam em `asaas_event_log`. Ver [webhook_receive.md](docs/webhook_receive.md).
 
 ## Comportamentos úteis
 
-**Cliente na emissão:** envie `customer` (`cus_...`) ou `customerData` para buscar, criar ou atualizar antes de cobrar. Ver `[docs/cliente_resolucao_automatica.md](docs/cliente_resolucao_automatica.md)`.
+**Cliente na emissão:** envie `customer` (`cus_...`) ou `customerData` para buscar, criar ou atualizar antes de cobrar. Ver [cliente_resolucao_automatica.md](docs/cliente_resolucao_automatica.md).
 
-**Cupom e desconto:** `couponType`, `couponValue` e `couponDueDateLimitDays` convertem para `discount` da Asaas; também é aceito `discount` no formato da API. Guia completo: `[docs/desconto_multas_juros.md](docs/desconto_multas_juros.md)`.
+**Cupom e desconto:** `couponType`, `couponValue` e `couponDueDateLimitDays` convertem para `discount` da Asaas; também é aceito `discount` no formato da API. Guia completo: [desconto_multas_juros.md](docs/desconto_multas_juros.md).
 
 **NFS-e:** defaults em `config/issue_invoice.php`; `issueNow` controla agendar vs emitir na sequência.
 
@@ -239,7 +239,7 @@ php tests/contract_test.php
 php tests/security_test.php
 ```
 
-Checklist manual (sandbox e produção): `[TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md)`.
+Checklist manual (sandbox e produção): [TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md).
 
 ## Estrutura do projeto
 
@@ -266,9 +266,9 @@ asaas-biblioteca/
 
 ## Documentação
 
-- `[docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md)` — HTTP vs in-process, ambiente, erros e validação
-- `[docs/ACOES_INDICE.md](docs/ACOES_INDICE.md)` — índice de todas as ações
-- `[TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md)` — plano de testes e smoke
+- [USO_CHAMADAS.md](docs/USO_CHAMADAS.md) — HTTP vs in-process, ambiente, erros e validação
+- [ACOES_INDICE.md](docs/ACOES_INDICE.md) — índice de todas as ações
+- [TESTES_BIBLIOTECA.md](TESTES_BIBLIOTECA.md) — plano de testes e smoke
 
 ## Licença
 

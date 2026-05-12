@@ -24,4 +24,4 @@ Cancelar uma NFS-e na Asaas.
 $gateway->cancelInvoice('inv_123');
 ```
 
-Mais formas de chamada: [`USO_CHAMADAS.md`](./USO_CHAMADAS.md).
+Mais formas de chamada: [USO_CHAMADAS.md](./USO_CHAMADAS.md).

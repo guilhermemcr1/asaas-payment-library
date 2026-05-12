@@ -10,7 +10,7 @@ Atualizar uma assinatura existente.
 - `subscriptionId`: `sub_...`
 - `subscriptionData`: campos a alterar (`value`, `nextDueDate`, `cycle`, `billingType`, `updatePendingPayments`, `discount`, `fine`, `interest`, `split`, etc.)
 
-Na atualização, use `discount` no formato Asaas; cupom interno não é convertido neste fluxo. Ver [`desconto_multas_juros.md`](./desconto_multas_juros.md).
+Na atualização, use `discount` no formato Asaas; cupom interno não é convertido neste fluxo. Ver [desconto_multas_juros.md](./desconto_multas_juros.md).
 
 ## Exemplo HTTP
 
@@ -33,4 +33,4 @@ $gateway->updateSubscription('sub_123', [
 ]);
 ```
 
-Mais formas de chamada: [`USO_CHAMADAS.md`](./USO_CHAMADAS.md).
+Mais formas de chamada: [USO_CHAMADAS.md](./USO_CHAMADAS.md).

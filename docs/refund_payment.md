@@ -29,4 +29,4 @@ Estornar uma cobrança recebida ou confirmada.
 $gateway->refundPayment('pay_123', ['value' => 50.0]);
 ```
 
-Mais formas de chamada: [`USO_CHAMADAS.md`](./USO_CHAMADAS.md).
+Mais formas de chamada: [USO_CHAMADAS.md](./USO_CHAMADAS.md).

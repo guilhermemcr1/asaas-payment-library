@@ -24,4 +24,4 @@ Consultar uma NFS-e pelo ID Asaas.
 $gateway->getInvoice('inv_123');
 ```
 
-Mais formas de chamada: [`USO_CHAMADAS.md`](./USO_CHAMADAS.md).
+Mais formas de chamada: [USO_CHAMADAS.md](./USO_CHAMADAS.md).

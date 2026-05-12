@@ -10,7 +10,7 @@ Atualizar uma cobrança existente na Asaas.
 - `paymentId`: `pay_...`
 - `paymentData`: campos a alterar (`value`, `dueDate`, `description`, `billingType`, `discount`, `fine`, `interest`, `split`, etc.)
 
-Na atualização, use `discount` no formato Asaas; cupom interno (`couponType` / `couponValue`) não é convertido neste fluxo. Ver [`desconto_multas_juros.md`](./desconto_multas_juros.md).
+Na atualização, use `discount` no formato Asaas; cupom interno (`couponType` / `couponValue`) não é convertido neste fluxo. Ver [desconto_multas_juros.md](./desconto_multas_juros.md).
 
 ## Exemplo HTTP
 
@@ -33,4 +33,4 @@ $gateway->updatePayment('pay_123', [
 ]);
 ```
 
-Mais formas de chamada: [`USO_CHAMADAS.md`](./USO_CHAMADAS.md).
+Mais formas de chamada: [USO_CHAMADAS.md](./USO_CHAMADAS.md).

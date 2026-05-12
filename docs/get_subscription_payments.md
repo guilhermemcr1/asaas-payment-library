@@ -26,4 +26,4 @@ Listar cobranças vinculadas a uma assinatura.
 $gateway->getSubscriptionPayments('sub_123', ['limit' => 50]);
 ```
 
-Mais formas de chamada: [`USO_CHAMADAS.md`](./USO_CHAMADAS.md).
+Mais formas de chamada: [USO_CHAMADAS.md](./USO_CHAMADAS.md).

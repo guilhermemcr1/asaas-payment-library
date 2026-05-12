@@ -6,7 +6,7 @@ Criar assinatura na Asaas (`/subscriptions`).
 
 ## Defaults em arquivo
 
-`config/create_subscription.php` define `billingType`, `cycle`, `nextDueDateOffsetDays`, desconto, multas/juros e demais campos padrão. O payload da chamada sobrescreve esses valores. Ver [`desconto_multas_juros.md`](./desconto_multas_juros.md).
+`config/create_subscription.php` define `billingType`, `cycle`, `nextDueDateOffsetDays`, desconto, multas/juros e demais campos padrão. O payload da chamada sobrescreve esses valores. Ver [desconto_multas_juros.md](./desconto_multas_juros.md).
 
 ## Payload
 
@@ -30,7 +30,7 @@ Opcionais principais:
 - `externalReference`
 - `updatePendingPayments` (bool)
 - `discount` ou cupom (`couponType`, `couponValue`, `couponDueDateLimitDays` e aliases `coupon_*`)
-- `fine`, `interest`, `split`, `callback` (detalhes em [`desconto_multas_juros.md`](./desconto_multas_juros.md))
+- `fine`, `interest`, `split`, `callback` (detalhes em [desconto_multas_juros.md](./desconto_multas_juros.md))
 
 ## Exemplo
 

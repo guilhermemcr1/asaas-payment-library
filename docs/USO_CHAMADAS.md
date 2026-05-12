@@ -2,7 +2,7 @@
 
 A biblioteca oferece dois caminhos para a mesma regra de negócio.
 
-Configure o deploy copiando [`config/options_example.php`](../config/options_example.php) para `config/options.php` e preenchendo credenciais fora do Git. Visão geral: [`README.md`](../README.md).
+Configure o deploy copiando [config/options_example.php](../config/options_example.php) para `config/options.php` e preenchendo credenciais fora do Git. Visão geral: [README.md](../README.md).
 
 ## 1. HTTP remoto (cURL)
 
@@ -47,7 +47,7 @@ Regras de negócio ficam em arquivos dedicados em `config/` (ex.: `create_paymen
 
 Em `create_payment` via HTTP, `paymentMethod` pode ser omitido quando `config/http_actions.php` define `defaultPaymentMethod` (padrão `pix`). Listagens sem `limit` usam `defaultLimit` de `config/listagens.php` (padrão `100`).
 
-Desconto, cupom, multas e juros: [`desconto_multas_juros.md`](./desconto_multas_juros.md).
+Desconto, cupom, multas e juros: [desconto_multas_juros.md](./desconto_multas_juros.md).
 
 ## Resposta padrão
 

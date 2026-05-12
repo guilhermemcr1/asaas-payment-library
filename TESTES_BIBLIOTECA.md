@@ -2,7 +2,7 @@
 
 Checklist para validar a biblioteca em sandbox e, depois, repetir os cenários críticos em produção.
 
-Visão geral do projeto: [`README.md`](README.md). Formas de chamada (HTTP e `AsaasGateway`): [`docs/USO_CHAMADAS.md`](docs/USO_CHAMADAS.md). Índice de ações: [`docs/ACOES_INDICE.md`](docs/ACOES_INDICE.md).
+Visão geral do projeto: [README.md](README.md). Formas de chamada (HTTP e `AsaasGateway`): [docs/USO_CHAMADAS.md](docs/USO_CHAMADAS.md). Índice de ações: [docs/ACOES_INDICE.md](docs/ACOES_INDICE.md).
 
 ## 0) Testes automatizados locais
 
@@ -16,7 +16,7 @@ Visão geral do projeto: [`README.md`](README.md). Formas de chamada (HTTP e `As
 
 ## 1) Pré-requisitos
 
-- [ ] `config/options.php` criado a partir de [`config/options_example.php`](config/options_example.php) (não versionar credenciais reais).
+- [ ] `config/options.php` criado a partir de [config/options_example.php](config/options_example.php) (não versionar credenciais reais).
 - [ ] `prod_hosts`, `dev_hosts` e `environment` (`auto`, `sandbox` ou `production`) coerentes com o deploy.
 - [ ] Chaves e tokens Asaas preenchidos (preferir variáveis de ambiente em produção).
 - [ ] `internal.allowed_ips` com IPs reais do servidor chamador (sem hostnames).

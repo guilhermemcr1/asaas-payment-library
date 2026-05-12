@@ -24,4 +24,4 @@ Consultar um cliente pelo ID Asaas.
 $gateway->getCustomer('cus_123');
 ```
 
-Mais formas de chamada: [`USO_CHAMADAS.md`](./USO_CHAMADAS.md).
+Mais formas de chamada: [USO_CHAMADAS.md](./USO_CHAMADAS.md).
