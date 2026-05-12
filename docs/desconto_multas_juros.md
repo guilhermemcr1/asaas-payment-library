@@ -17,7 +17,7 @@ Na emissão, use os guias de [PIX](./create_payment_pix.md), [boleto](./create_p
 
 ## Duas formas de desconto na emissão
 
-### 1. Cupom interno (atalho Finax)
+### 1. Cupom interno (atalho da biblioteca)
 
 Campos no payload (ou nos defaults da ação em `config/*.php`):
 

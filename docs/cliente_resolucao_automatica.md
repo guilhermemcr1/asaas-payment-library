@@ -17,7 +17,7 @@ Exemplo no arquivo:
 
 ```php
 'defaults' => [
-    'fallbackName' => 'Cliente Finax',
+    'fallbackName' => 'Cliente sem nome',
 ],
 ```
 
